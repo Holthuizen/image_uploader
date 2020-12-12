@@ -1,10 +1,10 @@
 
 images/
 images/*
-.JPG
-.PNG
-.WEBP
-.GIF
+*.JPG
+*.PNG
+*.WEBP
+*.GIF
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
