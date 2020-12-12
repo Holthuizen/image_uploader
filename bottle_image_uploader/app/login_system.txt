@@ -1,0 +1,21 @@
+login system 
+
+active_users = {user1:pw1, user2:pw2}
+
+def login_required: 
+    user not in active_users:
+    redirect to /login
+return True
+
+/login
+def authenticate_user(username, pw)
+    correct_pw = users[username]
+    if correct_pw == pw: 
+        active_users[username] = pw
+        return True
+    else: 
+        return False
+
+
+def logout(username)
+    remove(user,active_users)
