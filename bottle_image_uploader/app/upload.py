@@ -1,4 +1,6 @@
 import os
+import hashlib
+import time
 from bottle import route, redirect, request, static_file, run, abort , auth_basic, template
 
 #global
@@ -10,50 +12,56 @@ ACTIVE_USERS= {}
 
 @route('/')
 def home():
-    if loged_in(request.query.username):
+    if logged_in(request.query.username):
         return template('upload.tpl',username=request.query.username)
     else: 
         redirect('/login')
 
-@route('/show/<category>/<filename>')
-def server_static(filename, category):
-    save_path = img_path+category
-    return static_file(filename, root=save_path)
+@route('/show/<filename>') #http://localhost:8080/show/bff8ec4eda409ee7ffb1d025613e0e1a869d18566eff138240830ede3f2883c1.PNG?username=user
+def server_static(filename):
+    if not request.query.username or not logged_in(request.query.username):
+        redirect('/login?msg= You need to be logged in view images, enter username and pw below')
+    return static_file(filename, root=img_path)
+
 
 
 @route('/upload/', method="GET")
 def get_upload():
+    #not a endpoint
     redirect('/')
 
-@route('/upload/', method='POST')
+@route('/upload/', method='POST') 
 def do_upload():
-    if not request.query.username:
-        redirect("/login")
-    if not loged_in(request.query.username):
-        redirect('/login?msg= You need to be loged in to upload, enter username and pw below')
+    if not request.query.username or not logged_in(request.query.username):
+        redirect('/login?msg= You need to be logged in to upload, enter username and pw below')
         
-    category = request.forms.get('category')
     upload = request.files.get('upload')
+    username = request.query.username
     
     name, ext = os.path.splitext(upload.filename)
-    if ext not in ('.png', '.jpg', '.jpeg', '.JPG', '.PNG', '.JPEG', ".gif",".GIF"):
-        return "<h3>File extension not allowed.</h3>"
+    if ext.upper() not in ( '.WEBP','.JPG', '.PNG', '.JPEG',".GIF"):
+        return "<h3> File extension not allowed.</h3>"
 
+    #hashlib action:
+    _name = upload.filename + username
+    m = hashlib.sha256()
+    m.update(_name.encode())
+    m.digest()
+    hash_name = m.hexdigest()
+    print("hash: ", hash_name)
 
-    #make dir
-    save_path = f"{img_path}{category}"
-    if not os.path.exists(save_path):
-        os.makedirs(save_path)
+    if not os.path.exists(img_path):
+        os.makedirs(img_path)
     
-    file_path = f"{save_path}/{upload.filename}"
+    file_path = f"{img_path}/{hash_name}{ext}"
     try:
         upload.save(file_path)
     except IOError as e:
         print("file cannot be overwritten, rename and try again",e) #to do handel this better
-    redirect(f'/show/{category}/{name}{ext}')
+    redirect(f'/show/{hash_name}{ext}?username={username}')
+
 
 #security#
-
 def login_required(username):
     if username in ACTIVE_USERS:
         return True
@@ -68,12 +76,12 @@ def authenticate_user(username, pw):
         ACTIVE_USERS[username]= pw 
         return True
 
-def loged_in(username): 
+def logged_in(username): 
     if username in ACTIVE_USERS:
         return True
 
 def log_out(username):
-    if loged_in(username):
+    if logged_in(username):
         try:
             print(ACTIVE_USERS.pop(username,False))
         except:
@@ -105,7 +113,7 @@ def logout(username):
 
 
 if __name__ == '__main__':
-    run(debug=True, host='0.0.0.0', port=8080, reloader=True)
+    run(debug=True, host='localhost', port=8080, reloader=True)
 
 
 
