@@ -17,13 +17,9 @@ def home():
     else: 
         redirect('/login')
 
-@route('/show/<filename>') #http://localhost:8080/show/bff8ec4eda409ee7ffb1d025613e0e1a869d18566eff138240830ede3f2883c1.PNG?username=user
+@route('/show/<filename>')
 def server_static(filename):
-    if not signed_in(request.query.username,request.query.token):
-        redirect('/login?msg= You need to be logged in view images, enter username and pw below')
     return static_file(filename, root=img_path)
-
-
 
 @route('/upload/', method="GET")
 def get_upload():
@@ -69,7 +65,7 @@ def signed_in(username,token):
             return True
     redirect('/login')
 
-#return token if succes, false if fail
+#return true if success, false if fail
 def sign_in(username,password):
     if username and password: 
         if username in USERS: 
@@ -77,7 +73,7 @@ def sign_in(username,password):
                 _token = username + password
                 _token =  hashlib.sha256(_token.encode()).hexdigest()
                 ACTIVE_USERS[username] = _token
-                return username, _token
+                return True
     return False
         
 
@@ -91,26 +87,24 @@ def login():
 
 @route('/login', method='POST') 
 def do_login():
-    
-    username, token = sign_in(request.forms.get('username'),request.forms.get('password'))
-    if token : 
-        print(username,token )
-        redirect(f'/?username={username}&token={token}')
+    if sign_in(request.forms.get('username'),request.forms.get('password')):
+        redirect(f"/?username={request.forms.get('username')}&token={ACTIVE_USERS[request.forms.get('username')]}")
     else:
         redirect("/login?msg=Incorrect username/password combination, you can try again") #get form
-
-
-
-@route('/logout/<username>')
-def logout(username):
-    log_out(username)
-    redirect('/')
-
 
     
 
 if __name__ == '__main__':
     run(debug=True, host='localhost', port=8080, reloader=True)
+
+#https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication # yes, use TSL 2.0
+#https://www.nginx.com/blog/securing-urls-secure-link-module-nginx-plus/ #what is the difference between this and hashing the filename?
+#https://docs.nginx.com/nginx/admin-guide/security-controls/configuring-subrequest-authentication/ #very cool but complex.. 
+
+#make multiple servers with each there own .htpass file
+#hash the file names
+#very-optional, add a username/pw system in bottle. try to make this separate from the main code, try adding a request cookie and a db with usernames
+
 
 
 
