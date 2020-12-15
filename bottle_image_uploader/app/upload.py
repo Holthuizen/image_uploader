@@ -37,8 +37,8 @@ def server_static(short_url):
         copy_url = f"{SERVER}/show/{short_url}"
         download_url = f"{SERVER}/download/{filename}"
         delete_url = f"{SERVER}/delete/{short_url}"
-        
-        return template('show.tpl',category=category, url=full_url, short_url=copy_url, download_url = download_url, delete_url = delete_url )
+        category_url = f"{SERVER}/category/{category}"
+        return template('show.tpl',category=category,category_url=category_url, url=full_url, short_url=copy_url, download_url = download_url, delete_url = delete_url )
     return f'<h2>img url not found</h2>' 
 
 @route('/delete/<short_url>')
@@ -104,17 +104,17 @@ def do_upload():
     find = Query()
     if not DB.contains(find.filename == filename): #this is almost always True, just to be sure
         DB.insert({'owner':'public','category':category,'short_url':short_url,'filename':filename})
+        #save file
+        if not os.path.exists(IMG_PATH):
+            os.makedirs(IMG_PATH)
+        try:
+            upload.save(file_path)
+        except IOError as e:
+            print("file cannot be overwritten, rename and try again",e) #to do handel this better
+    
     else: 
         print("file allready in db")
     
-    #save file
-    if not os.path.exists(IMG_PATH):
-        os.makedirs(IMG_PATH)
-    try:
-        upload.save(file_path)
-    except IOError as e:
-        print("file cannot be overwritten, rename and try again",e) #to do handel this better
-    #redirect(f'/show/{filename}')
     redirect(f'/show/{short_url}')
 
 

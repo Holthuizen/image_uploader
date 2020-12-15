@@ -1,15 +1,24 @@
-<br>
+<style>
+body {background-color: #d4d4d4; padding-left: 33%}
+img {max-width:900px; height: auto}
+</style>
 <body>
     % for item in collection:
-    <li>{{item}}</li>
+      <img src="{{item['full_url']}}">
+      <br>
+      <input type="text" value="{{item['copy_url']}}" id="{{item['copy_url']}}"> <input type="button" onclick="copy_short_url( '{{item['copy_url']}}' )" value="#Copy (short) URL" /> 
+      <input type="button" onclick="location.href='{{item['download_url']}}';" value="#Download" /> 
+      <input type="button" onclick="location.href='{{item['delete_url']}}';" value="#Delete" /> 
+      <br>
+      <br>
     % end
 </body>
 
 
 <script>
-function copy_short_url() {
+function copy_short_url(short_url) {
   /* Get the text field */
-  var copyText = document.getElementById("short_url");
+  var copyText = document.getElementById(short_url);
 
   /* Select the text field */
   copyText.select();

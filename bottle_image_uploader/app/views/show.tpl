@@ -1,5 +1,6 @@
 <br>
-<h3>Category: {{ category }}</h3>
+<h3>Category:  
+<a href="{{ category_url }}">{{category}}</a> </h3>
 <body>
     <img src="{{url}}">
     <input id="cb" type="text" hidden>
