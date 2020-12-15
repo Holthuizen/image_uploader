@@ -6,6 +6,9 @@
 
       <form class="upload_form" action="/upload/" method="post" enctype="multipart/form-data">
         <div class="file_field">
+            <span><b>Add a Category tage: </b></span>
+            <input type="text" name="category" placeholder="default">
+            <br>
             <span><b>Choose an image: </b></span>
             <br>
             <input type="file" name="upload" placeholder=".png .jpg .gif" accept="image/*">
