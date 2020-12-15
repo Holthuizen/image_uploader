@@ -61,9 +61,18 @@ def delete(short_url):
 @route('/category/<category>')
 def category(category):
     collection = DB.search(where('category')==category)
-    for item in collection: 
-        print(item)
-
+    list1 = []
+    for data in collection: 
+        filename = data['filename']
+        short_url = data['short_url']
+        category = data['category']
+        #print("debug: ", data['filename'] )
+        full_url = f"{SERVER}/img/{filename}"
+        copy_url = f"{SERVER}/show/{short_url}"
+        download_url = f"{SERVER}/download/{filename}"
+        delete_url = f"{SERVER}/delete/{short_url}"
+        list1.append({'filename':filename, 'category':category, 'full_url':full_url, 'copy_url':copy_url, 'download_url':download_url, 'delete_url': delete_url})
+    return template('category', collection = list1)
 
 
 @route('/db')
@@ -83,7 +92,6 @@ def do_upload():
     m = hashlib.sha256( upload.filename.encode() +SALT.encode() )
     m.digest()
     hash_name = m.hexdigest()
-
 
     
     #create unique filename
