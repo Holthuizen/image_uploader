@@ -1,6 +1,7 @@
 <style>
 body {background-color: #d4d4d4; padding-left: 33%}
 img {max-width:900px; height: auto}
+button #delete {background-color: red}
 </style>
 <body>
     % for item in collection:
@@ -8,7 +9,7 @@ img {max-width:900px; height: auto}
       <br>
       <input type="text" value="{{item['copy_url']}}" id="{{item['copy_url']}}"> <input type="button" onclick="copy_short_url( '{{item['copy_url']}}' )" value="#Copy (short) URL" /> 
       <input type="button" onclick="location.href='{{item['download_url']}}';" value="#Download" /> 
-      <input type="button" onclick="location.href='{{item['delete_url']}}';" value="#Delete" /> 
+      <input type="button" id="delete" onclick="location.href='{{item['delete_url']}}';" value="#Delete" /> 
       <br>
       <br>
     % end

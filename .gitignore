@@ -135,3 +135,5 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+bottle_image_uploader/app/image_db.json
+*.json
