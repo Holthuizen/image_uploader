@@ -137,3 +137,4 @@ dmypy.json
 .pyre/
 bottle_image_uploader/app/image_db.json
 *.json
+bottle_image_uploader/app/image_db.json

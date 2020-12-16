@@ -1,11 +1,48 @@
+<head>
+<link rel="preconnect" href="https://fonts.gstatic.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+<title>Image Uploader By Carlos</title>
+</head>
+
 <style>
-body {background-color: #d4d4d4; padding-left: 33%}
+body { 
+ font-size: 4rem; 
+ font-family: 'Roboto', sans-serif;
+ background-color: #d4d4d4; 
+ padding-left: 33%; 
+ }
+
+ 
+input[type=text] {
+  padding: 15px 32px;
+  width: 350px; /* When specifying this, you can use both px and % */
+  font-size: 16px;
+  border: none;
+}
+
+input[type=button] {
+  background-color: #4CAF50; /* Green */
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+}
+
+ 
 img {max-width:900px; height: auto}
 button #delete {background-color: red}
+
 </style>
 <body>
+    <input type="button" id="Home" onclick="location.href='{{server}}';" value="#home" /> 
+    <hr>
+    <br>
+
     % for item in collection:
-      <img src="{{item['full_url']}}">
+      <a id="short_url" href="{{short_url}}"> <img src="{{item['full_url']}}"> </a><br>
       <br>
       <input type="text" value="{{item['copy_url']}}" id="{{item['copy_url']}}"> <input type="button" onclick="copy_short_url( '{{item['copy_url']}}' )" value="#Copy (short) URL" /> 
       <input type="button" onclick="location.href='{{item['download_url']}}';" value="#Download" /> 

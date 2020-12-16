@@ -4,7 +4,7 @@ img {max-width:auto; height: auto}
 
 input[type=text] {
   padding: 15px 32px;
-  width: 250px; /* When specifying this, you can use both px and % */
+  width: 350px; /* When specifying this, you can use both px and % */
   font-size: 16px;
   border: none;
 }
@@ -27,19 +27,14 @@ input[type=button] {
 <br>
 <h3>Category:  
 <a href="{{ category_url }}">{{category}}</a> </h3>
+<input type="button" id="Home" onclick="location.href='{{server}}';" value="#home" />
+<hr> <br> 
 <body>
-    <img src="{{url}}">
-    <input id="cb" type="text" hidden>
+    <a id="short_url" href="{{short_url}}"><img src="{{url}}"></a><br>
     <br>
-    <a id="short_url" href="{{short_url}}">{{short_url}}</a><br>
     <input type="text" value="{{short_url}}" id="short_url">
-    <input type="button" onclick="copy_short_url()" value="#Copy (short) URL" />
     <input type="button" onclick="location.href='{{download_url}}';" value="#Download" />
     <input type="button" id="delete" onclick="location.href='{{delete_url}}';" value="#Delete" />
-
-
-    
-
 </body>
 
 

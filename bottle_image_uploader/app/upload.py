@@ -8,7 +8,7 @@ from tinydb import TinyDB, Query, where
 DB = TinyDB('image_db.json')
 IMG_PATH = '../images/'
 SALT = "*34567"
-SERVER = "http://localhost:8080"
+SERVER = "http://5.199.148.201"
 
 @route('/')
 def home():
@@ -38,7 +38,7 @@ def server_static(short_url):
         download_url = f"{SERVER}/download/{filename}"
         delete_url = f"{SERVER}/delete/{short_url}"
         category_url = f"{SERVER}/category/{category}"
-        return template('show.tpl',category=category,category_url=category_url, url=full_url, short_url=copy_url, download_url = download_url, delete_url = delete_url )
+        return template('show.tpl', server = SERVER, category=category, category_url=category_url, url=full_url, short_url=copy_url, download_url = download_url, delete_url = delete_url )
     return f'<h2>img url not found</h2>' 
 
 @route('/delete/<short_url>')
@@ -72,7 +72,7 @@ def category(category):
         download_url = f"{SERVER}/download/{filename}"
         delete_url = f"{SERVER}/delete/{short_url}"
         list1.append({'filename':filename, 'category':category, 'full_url':full_url, 'copy_url':copy_url, 'download_url':download_url, 'delete_url': delete_url})
-    return template('category', collection = list1)
+    return template('category', server=SERVER,collection = list1)
 
 
 @route('/db')
@@ -119,7 +119,7 @@ def do_upload():
 
 
 if __name__ == '__main__':
-    run(debug=True, host='localhost', port=8080, reloader=True)
+    run(debug=True, host='0.0.0.0', port=8080, reloader=True)
 
 
 
