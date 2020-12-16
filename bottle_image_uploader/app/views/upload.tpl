@@ -1,3 +1,11 @@
+<style>
+  body {background-color: #d4d4d4; padding-left: 33%}
+  
+  img {max-width:900px; height: auto}
+
+</style>
+
+
 <body>
     <div class="container">
 
@@ -6,13 +14,10 @@
 
       <form class="upload_form" action="/upload/" method="post" enctype="multipart/form-data">
         <div class="file_field">
-            <span><b>Add a Category tage: </b></span>
-            <input type="text" name="category" placeholder="default">
+            <input type="text" name="category" placeholder="Add a Category">
+            <input type="file" name="upload" placeholder="suport for .png .jpg .gif" accept="image/*">
             <br>
-            <span><b>Choose an image: </b></span>
-            <br>
-            <input type="file" name="upload" placeholder=".png .jpg .gif" accept="image/*">
-            <input type="submit" value="Upload">
+            <input type="submit" value="Send">
         </div>
       </form>
     </div>
