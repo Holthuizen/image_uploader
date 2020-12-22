@@ -39,6 +39,7 @@ input[type=button] {
 
 
 <script>
+
 function copy_short_url() {
   /* Get the text field */
   var copyText = document.getElementById("short_url");

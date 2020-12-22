@@ -2,19 +2,20 @@ import os
 import hashlib
 import json
 from bottle import route, redirect, request, static_file, run, abort , auth_basic, template, TEMPLATE_PATH
-from tinydb import TinyDB, Query, where
+from tinydb import TinyDB, where
 
 #GLOBAL
 DB = TinyDB('image_db.json')
 IMG_PATH = '../images/'
-SALT = "*34567"
-SERVER = "http://5.199.148.201"
+SALT = b"*34567"
+SERVER = "http://localhost:8080"
+#SERVER = "http://imgupl.ddns.net"
 
 @route('/')
 def home():
-    return template('upload.tpl')
-
-#http://localhost:8080/show/729227-8.png
+    if request.query.msg:
+        return template('upload.tpl', list_url = f"{SERVER}/list", msg = request.query.msg )
+    return template('upload.tpl', list_url = f"{SERVER}/list", msg="")
 
 @route('/download/<filename>')
 def download(filename):
@@ -26,19 +27,22 @@ def server_static(filename):
 
 @route('/show/<short_url>')
 def server_static(short_url):
-    
     data = DB.search(where('short_url') == short_url)
-    if data: 
+    ''' if short url point to data in db '''
+    if data[0]: 
         data = data[0]
         filename = data['filename']
         category = data['category']
-        #print("debug: ", data['filename'] )
-        full_url = f"{SERVER}/img/{filename}"
-        copy_url = f"{SERVER}/show/{short_url}"
-        download_url = f"{SERVER}/download/{filename}"
-        delete_url = f"{SERVER}/delete/{short_url}"
-        category_url = f"{SERVER}/category/{category}"
-        return template('show.tpl', server = SERVER, category=category, category_url=category_url, url=full_url, short_url=copy_url, download_url = download_url, delete_url = delete_url )
+
+        return template(
+            'show.tpl', server = SERVER,
+            category=category,
+            category_url=f"{SERVER}/category/{category}",
+            url=f"{SERVER}/img/{filename}",
+            short_url=f"{SERVER}/show/{short_url}",
+            download_url = f"{SERVER}/download/{filename}", 
+            delete_url = f"{SERVER}/delete/{short_url}" 
+        )
     return f'<h2>img url not found</h2>' 
 
 @route('/delete/<short_url>')
@@ -51,11 +55,13 @@ def delete(short_url):
         os.remove(file_path) 
         DB.remove(where('short_url') == short_url)
         redirect('/')
-    else: 
-        return '<h2>URL/File not found </h2>'
+    return '<h2>URL/File not found </h2>'
 
 
-
+@route('/list')
+def list_categories(): 
+    categories = [r['category'] for r in DB]
+    return template('category_list', server=SERVER, collection = set(categories))
 
 
 @route('/category/<category>')
@@ -66,7 +72,6 @@ def category(category):
         filename = data['filename']
         short_url = data['short_url']
         category = data['category']
-        #print("debug: ", data['filename'] )
         full_url = f"{SERVER}/img/{filename}"
         copy_url = f"{SERVER}/show/{short_url}"
         download_url = f"{SERVER}/download/{filename}"
@@ -75,34 +80,39 @@ def category(category):
     return template('category', server=SERVER,collection = list1)
 
 
-@route('/db')
-def print_db():
-    return f"{DB.all()}"
-    
+''' get data from form
+    required: 
+    category <string> 
+    file <string> supported types : webp, jpeg, png, bmp
+    file get stored on server with a hashed name sha256 + a constant salt.
+
+'''
 @route('/upload/', method='POST') 
 def do_upload():
     category = request.forms.get('category')
     upload = request.files.get('upload')
     name, ext = os.path.splitext(upload.filename)
+    
+    if not category: 
+        redirect('/?msg=Category cannot be empty')
+    
     ext = ext.lower()
-    if ext.upper() not in ( '.JPG', '.PNG', '.JPEG',".GIF"):
+    if ext.upper() not in ( '.WEBP', '.JPG', '.PNG', '.JPEG','.GIF', '.BMP'):
         return "<h3> File extension not allowed.</h3>"
 
     #hashlib action:
-    m = hashlib.sha256( upload.filename.encode() +SALT.encode() )
+    m = hashlib.sha256( upload.filename.encode() + SALT)
     m.digest()
     hash_name = m.hexdigest()
 
-    
     #create unique filename
-    index = str( len(DB) ) #auto incremeting
     filename = f"{hash_name}{ext}"
-    short_url = f"{hash_name[0:6]}-{index}{ext}"
-    file_path = f"{IMG_PATH}/{filename}"
-    
-    #db entry
-    find = Query()
-    if not DB.contains(find.filename == filename): #this is almost always True, just to be sure
+    ''' if not already in db, add entry ''' 
+    if not DB.contains(where('filename') == filename):
+        index = str( len(DB) ) #auto incremeting
+        short_url = f"{hash_name[0:6]}-{index}{ext}"
+        file_path = f"{IMG_PATH}/{filename}"
+
         DB.insert({'owner':'public','category':category,'short_url':short_url,'filename':filename})
         #save file
         if not os.path.exists(IMG_PATH):
@@ -110,22 +120,31 @@ def do_upload():
         try:
             upload.save(file_path)
         except IOError as e:
-            print("file cannot be overwritten, rename and try again",e) #to do handel this better
-    
+            redirect(f'/?msg=file allready exists got to: /show/{short_url}')
+        redirect(f'/show/{short_url}')
     else: 
-        print("file allready in db")
+         data = DB.search(where('filename') == filename)
+         data = data[0]
+         short_url = data['short_url']
+         redirect(f'/show/{short_url}')
     
-    redirect(f'/show/{short_url}')
+
+#for debugging, dangerous route 
+@route('/db')
+def print_db():
+    return f"{DB.all()}"
 
 
 if __name__ == '__main__':
-    run(debug=True, host='0.0.0.0', port=8080, reloader=True)
+    run(debug=True, host='localhost', port=8080, reloader=True)
 
 
 
 
 
-
+# added suport for bmp and webp 
+# max file size now 24MB
+# 
 
 
 

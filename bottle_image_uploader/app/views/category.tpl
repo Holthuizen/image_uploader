@@ -6,10 +6,11 @@
 
 <style>
 body { 
- font-size: 4rem; 
- font-family: 'Roboto', sans-serif;
- background-color: #d4d4d4; 
- padding-left: 33%; 
+  font-size: 2rem; 
+  font-family: 'Roboto', sans-serif;
+  background-color: #d4d4d4; 
+  padding-left:  1rem; 
+  padding-right: 2rem;
  }
 
  
@@ -34,19 +35,18 @@ input[type=button] {
  
 img {max-width:900px; height: auto}
 button #delete {background-color: red}
-
 </style>
+
 <body>
     <input type="button" id="Home" onclick="location.href='{{server}}';" value="#home" /> 
     <hr>
     <br>
 
     % for item in collection:
-      <a id="short_url" href="{{short_url}}"> <img src="{{item['full_url']}}"> </a><br>
+      <a id="short_url" href="{{item['copy_url']}}"> <img src="{{item['full_url']}}"> </a>
       <br>
       <input type="text" value="{{item['copy_url']}}" id="{{item['copy_url']}}"> <input type="button" onclick="copy_short_url( '{{item['copy_url']}}' )" value="#Copy (short) URL" /> 
       <input type="button" onclick="location.href='{{item['download_url']}}';" value="#Download" /> 
-      <input type="button" id="delete" onclick="location.href='{{item['delete_url']}}';" value="#Delete" /> 
       <br>
       <br>
     % end
